@@ -1,22 +1,30 @@
 'use client';
 
-export default function LoadingSpinner({ size = 'md', text = 'Loading...' }) {
-  const sizes = {
+export default function LoadingSpinner({ size = 'md', color = 'primary' }) {
+  const sizeClasses = {
     sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16'
+    md: 'w-6 h-6',
+    lg: 'w-8 h-8',
+    xl: 'w-12 h-12'
+  };
+
+  const colorClasses = {
+    primary: 'text-blue-600',
+    secondary: 'text-gray-600',
+    success: 'text-green-600',
+    warning: 'text-yellow-600',
+    danger: 'text-red-600'
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="relative">
-        <div className={`${sizes[size]} border-4 border-purple-200 rounded-full animate-spin`}></div>
-        <div className={`absolute top-0 left-0 ${sizes[size]} border-4 border-transparent border-t-purple-600 rounded-full animate-spin`}></div>
+    <div className="flex items-center justify-center">
+      <div
+        className={`animate-spin rounded-full border-2 border-current border-t-transparent ${sizeClasses[size]} ${colorClasses[color]}`}
+        role="status"
+        aria-label="Loading"
+      >
+        <span className="sr-only">Loading...</span>
       </div>
-      {text && (
-        <p className="mt-3 text-gray-600 font-medium">{text}</p>
-      )}
     </div>
   );
 }

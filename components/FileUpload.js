@@ -4,41 +4,21 @@ import { useState } from 'react';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
 import useAppStore from '../lib/store';
 import { processFileData } from '../lib/fileUtils';
-import LoadingSpinner from './LoadingSpinner';
-import geminiService from '../lib/geminiService';
 
 export default function FileUpload() {
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { setFileData, setCurrentStep, setAnalyzing, setAiAnalysis, setAnalysisError } = useAppStore();
+  const { setFileData, setCurrentStep } = useAppStore();
+
   const handleFile = async (file) => {
     setLoading(true);
     setError('');
     
     try {
-      // Process the file first
       const data = await processFileData(file);
       setFileData(data, file.name);
-      
-      // Start AI analysis
-      setAnalyzing(true);
-      try {
-        const analysis = await geminiService.analyzeDataStructure(data, file.name);
-        setAiAnalysis(analysis);
-        
-        // Generate insights if we have chart configs (will be empty initially)
-        const insights = await geminiService.generateInsights(data, []);
-        // We'll set insights later when we have chart configurations
-        
-      } catch (aiError) {
-        console.warn('AI analysis failed:', aiError);
-        setAnalysisError('AI analysis unavailable, using basic analysis');
-      } finally {
-        setAnalyzing(false);
-      }
-      
       setCurrentStep('configure');
     } catch (err) {
       setError(err.message);
@@ -115,10 +95,15 @@ export default function FileUpload() {
               accept=".csv,.xlsx,.xls"
               onChange={handleChange}
               disabled={loading}
-            />            {loading ? (
+            />
+              {loading ? (
               <div className="flex flex-col items-center">
-                <LoadingSpinner size="lg" text="Processing your file..." />
-                <p className="text-gray-500 mt-4 text-sm">This won't take long</p>
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-purple-200 rounded-full animate-spin"></div>
+                  <div className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-purple-600 rounded-full animate-spin"></div>
+                </div>
+                <p className="text-gray-600 mt-6 text-lg font-medium">Processing your file...</p>
+                <p className="text-gray-500 mt-2">This won't take long</p>
               </div>
             ) : (
               <div className="flex flex-col items-center">

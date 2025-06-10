@@ -17,21 +17,38 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import useAppStore from '../lib/store';
-import geminiService from '../lib/geminiService';
+import GeminiService from '../lib/geminiService';
 
 const COLORS = [
-  '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444',
-  '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'
+  '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff00',
+  '#0088fe', '#00c49f', '#ffbb28', '#ff8042', '#8dd1e1'
 ];
 
 export default function ChartRenderer({ chart, data, theme = 'light' }) {
-  const { aiAnalysis } = useAppStore();
-  
-  // Use AI-enhanced data processing if insights are available
-  const processedData = aiAnalysis 
-    ? geminiService.processDataForChart(data, chart, aiAnalysis)
-    : processDataForChart(data, chart);
+  // Use AI-powered data processing for more accurate chart rendering
+  const processedData = GeminiService.processDataForChart(data, chart);
+
+  // Fallback if AI processing fails
+  if (!processedData || processedData.length === 0) {
+    return (
+      <div className={`backdrop-blur-xl rounded-2xl shadow-xl border p-8 ${
+        theme === 'dark' 
+          ? 'bg-gray-800/80 border-gray-700/50' 
+          : 'bg-white/80 border-white/20'
+      }`}>
+        <div className="flex items-center justify-center h-80">
+          <div className="text-center">
+            <div className={`text-6xl mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`}>
+              📊
+            </div>
+            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              No data available for this chart
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const commonProps = {
     data: processedData,
@@ -39,9 +56,17 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
   };
 
   const axisProps = {
-    tick: { fill: theme === 'dark' ? '#e5e7eb' : '#374151' },
+    tick: { fill: theme === 'dark' ? '#e5e7eb' : '#374151', fontSize: 12 },
     axisLine: { stroke: theme === 'dark' ? '#4b5563' : '#d1d5db' },
     tickLine: { stroke: theme === 'dark' ? '#4b5563' : '#d1d5db' }
+  };
+
+  const tooltipStyle = {
+    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+    border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
+    color: theme === 'dark' ? '#e5e7eb' : '#374151',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
   };
 
   const renderChart = () => {
@@ -52,18 +77,13 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
             <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
             <XAxis dataKey={chart.xAxis} {...axisProps} />
             <YAxis {...axisProps} />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: theme === 'dark' ? '#e5e7eb' : '#374151'
-              }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Legend />
             <Bar 
               dataKey={chart.yAxis} 
               fill={COLORS[0]}
               name={chart.yAxis}
+              radius={[2, 2, 0, 0]}
             />
           </BarChart>
         );
@@ -74,19 +94,15 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
             <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
             <XAxis dataKey={chart.xAxis} {...axisProps} />
             <YAxis {...axisProps} />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: theme === 'dark' ? '#e5e7eb' : '#374151'
-              }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Legend />
             <Line 
               type="monotone" 
               dataKey={chart.yAxis} 
               stroke={COLORS[1]}
-              strokeWidth={2}
+              strokeWidth={3}
+              dot={{ fill: COLORS[1], strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, stroke: COLORS[1], strokeWidth: 2 }}
               name={chart.yAxis}
             />
           </LineChart>
@@ -98,13 +114,7 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
             <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
             <XAxis dataKey={chart.xAxis} {...axisProps} />
             <YAxis {...axisProps} />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: theme === 'dark' ? '#e5e7eb' : '#374151'
-              }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Legend />
             <Area 
               type="monotone" 
@@ -112,43 +122,62 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
               stroke={COLORS[2]}
               fill={COLORS[2]}
               fillOpacity={0.6}
+              strokeWidth={2}
               name={chart.yAxis}
             />
           </AreaChart>
         );
 
       case 'pie':
+        const pieData = processedData.slice(0, 10); // Limit to 10 slices for readability
         return (
           <PieChart {...commonProps}>
             <Pie
-              data={processedData}
+              data={pieData}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              outerRadius={80}
+              label={({ name, percent }) => 
+                percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : ''
+              }
+              outerRadius={100}
               fill="#8884d8"
               dataKey={chart.yAxis}
               nameKey={chart.xAxis}
             >
-              {processedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              {pieData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]}
+                  stroke={theme === 'dark' ? '#1f2937' : '#ffffff'}
+                  strokeWidth={2}
+                />
               ))}
             </Pie>
             <Tooltip 
-              contentStyle={{
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: theme === 'dark' ? '#e5e7eb' : '#374151'
-              }}
+              contentStyle={tooltipStyle}
+              formatter={(value, name) => [
+                typeof value === 'number' ? value.toLocaleString() : value,
+                name
+              ]}
             />
+            <Legend />
           </PieChart>
         );
 
       default:
-        return <div>Unsupported chart type</div>;
+        return (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                Unsupported chart type: {chart.type}
+              </p>
+            </div>
+          </div>
+        );
     }
   };
+
   return (
     <div className={`backdrop-blur-xl rounded-2xl shadow-xl border transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
       theme === 'dark' 
@@ -174,63 +203,18 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
           </ResponsiveContainer>
         </div>
       </div>
+      {/* AI Enhancement Badge */}
+      <div className="mt-4 flex items-center justify-center">
+        <div className={`px-2 py-1 rounded-lg text-xs flex items-center ${
+          theme === 'dark' 
+            ? 'bg-purple-900/30 text-purple-300' 
+            : 'bg-purple-50 text-purple-600'
+        }`}>
+          <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+          </svg>
+          AI-Enhanced
+        </div>      </div>
     </div>
   );
-}
-
-function processDataForChart(data, chart) {
-  if (!data || data.length === 0) return [];
-
-  let processedData = [...data];
-
-  // Handle grouping if specified
-  if (chart.groupBy && chart.groupBy !== '') {
-    const grouped = {};
-    
-    processedData.forEach(row => {
-      const groupKey = row[chart.groupBy];
-      const xValue = row[chart.xAxis];
-      const yValue = parseFloat(row[chart.yAxis]) || 0;
-      
-      const key = `${xValue}_${groupKey}`;
-      
-      if (!grouped[key]) {
-        grouped[key] = {
-          [chart.xAxis]: xValue,
-          [chart.yAxis]: 0,
-          [chart.groupBy]: groupKey
-        };
-      }
-      
-      grouped[key][chart.yAxis] += yValue;
-    });
-    
-    processedData = Object.values(grouped);
-  }
-
-  // For pie charts, we might need to aggregate data
-  if (chart.type === 'pie') {
-    const aggregated = {};
-    
-    processedData.forEach(row => {
-      const key = row[chart.xAxis];
-      const value = parseFloat(row[chart.yAxis]) || 0;
-      
-      if (!aggregated[key]) {
-        aggregated[key] = { [chart.xAxis]: key, [chart.yAxis]: 0 };
-      }
-      
-      aggregated[key][chart.yAxis] += value;
-    });
-    
-    processedData = Object.values(aggregated);
-  }
-
-  // Convert numeric values
-  processedData = processedData.map(row => ({
-    ...row,
-    [chart.yAxis]: parseFloat(row[chart.yAxis]) || 0
-  }));
-
-  return processedData;
 }

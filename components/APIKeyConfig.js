@@ -1,170 +1,128 @@
 'use client';
 
-import { useState } from 'react';
-import { Settings, Key, AlertCircle, CheckCircle, ExternalLink } from 'lucide-react';
-import useAppStore from '../lib/store';
+import { useState, useEffect } from 'react';
+import { Settings, Eye, EyeOff, Check, X, Key } from 'lucide-react';
 
 export default function APIKeyConfig() {
-  const { dashboardConfig } = useAppStore();
-  const [showConfig, setShowConfig] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [keyStatus, setKeyStatus] = useState('unconfigured'); // unconfigured, valid, invalid
   const [showKey, setShowKey] = useState(false);
+  const [saved, setSaved] = useState(false);
 
-  const isDark = dashboardConfig.theme === 'dark';
-
-  const validateKey = () => {
-    if (!apiKey || apiKey === 'your_api_key_here') {
-      setKeyStatus('invalid');
-      return;
-    }
-    
-    // Basic validation - keys should start with AIza and be reasonable length
-    if (apiKey.startsWith('AIza') && apiKey.length > 20) {
-      setKeyStatus('valid');
-      // Store in localStorage for demo purposes
-      localStorage.setItem('gemini_api_key', apiKey);
-      window.location.reload(); // Reload to apply the key
-    } else {
-      setKeyStatus('invalid');
-    }
-  };
-
-  const clearKey = () => {
-    setApiKey('');
-    setKeyStatus('unconfigured');
-    localStorage.removeItem('gemini_api_key');
-    window.location.reload();
-  };
-
-  // Check if key is already configured
-  useState(() => {
-    const storedKey = localStorage.getItem('gemini_api_key');
-    if (storedKey && storedKey !== 'demo-key') {
-      setApiKey(storedKey);
-      setKeyStatus('valid');
+  useEffect(() => {
+    // Load saved API key from localStorage
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+      setApiKey(savedKey);
     }
   }, []);
 
-  return (
-    <div className="relative">
+  const handleSave = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem('gemini_api_key', apiKey.trim());
+      setSaved(true);
+      setTimeout(() => {
+        setSaved(false);
+        setIsOpen(false);
+      }, 1500);
+    }
+  };
+
+  const handleClear = () => {
+    setApiKey('');
+    localStorage.removeItem('gemini_api_key');
+  };
+
+  if (!isOpen) {
+    return (
       <button
-        onClick={() => setShowConfig(!showConfig)}
-        className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-          isDark 
-            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-            : 'bg-white text-gray-600 hover:bg-gray-50'
-        } shadow-lg hover:shadow-xl hover:scale-105`}
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-4 right-4 p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all duration-200 z-50"
+        title="Configure API Keys"
       >
-        <Settings className="h-4 w-4" />
-        <span className="text-sm font-medium">AI Settings</span>
-        {keyStatus === 'valid' && <CheckCircle className="h-4 w-4 text-green-500" />}
-        {keyStatus === 'invalid' && <AlertCircle className="h-4 w-4 text-red-500" />}
+        <Key className="w-5 h-5" />
       </button>
+    );
+  }
 
-      {showConfig && (
-        <div className={`absolute top-full right-0 mt-2 w-96 rounded-2xl shadow-2xl border z-50 ${
-          isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}>
-          <div className="p-6">
-            <div className="flex items-center mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mr-3">
-                <Key className="h-4 w-4 text-white" />
-              </div>
-              <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                Gemini API Configuration
-              </h3>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  API Key
-                </label>
-                <div className="relative">
-                  <input
-                    type={showKey ? 'text' : 'password'}
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your Gemini API key"
-                    className={`w-full px-3 py-2 border rounded-lg text-sm transition-all duration-200 ${
-                      isDark 
-                        ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
-                        : 'bg-white border-gray-300 text-gray-900 focus:border-purple-500'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowKey(!showKey)}
-                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-xs ${
-                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    {showKey ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-              </div>
-
-              <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} space-y-1`}>
-                <p>• Get your API key from Google AI Studio</p>
-                <p>• Free tier includes generous usage limits</p>
-                <p>• Keys are stored locally in your browser</p>
-              </div>
-
-              <div className="flex items-center justify-between space-x-2">
-                <a
-                  href="https://makersuite.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center text-xs ${
-                    isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                  } transition-colors`}
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <Settings className="w-5 h-5 text-blue-600 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              API Configuration
+            </h3>
+          </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Gemini API Key
+              </label>
+              <div className="relative">
+                <input
+                  type={showKey ? 'text' : 'password'}
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter your Gemini API key..."
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKey(!showKey)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  Get API Key
-                </a>
-                
-                <div className="flex space-x-2">
-                  {keyStatus === 'valid' && (
-                    <button
-                      onClick={clearKey}
-                      className="px-3 py-1 text-xs bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200"
-                    >
-                      Clear
-                    </button>
-                  )}
-                  <button
-                    onClick={validateKey}
-                    className="px-3 py-1 text-xs bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
-                  >
-                    Save
-                  </button>
-                </div>
+                  {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-
-              {keyStatus === 'invalid' && (
-                <div className="flex items-start space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
-                  <div className="text-xs text-red-700">
-                    <p className="font-medium">Invalid API Key</p>
-                    <p>Please check your key and try again. Keys should start with "AIza".</p>
-                  </div>
-                </div>
-              )}
-
-              {keyStatus === 'valid' && (
-                <div className="flex items-start space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                  <div className="text-xs text-green-700">
-                    <p className="font-medium">API Key Configured</p>
-                    <p>AI features are now enabled for intelligent insights and recommendations.</p>
-                  </div>
-                </div>
-              )}
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Your API key is stored locally and never sent to our servers
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex justify-between mt-6">
+            <button
+              onClick={handleClear}
+              className="px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            >
+              Clear
+            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={!apiKey.trim() || saved}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-green-600 text-white rounded-lg transition-colors flex items-center"
+              >
+                {saved ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Saved
+                  </>
+                ) : (
+                  'Save'
+                )}
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
