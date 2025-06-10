@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import useAppStore from '../lib/store';
 import ChartRenderer from './ChartRenderer';
+import EnhancedChartRenderer from './EnhancedChartRenderer';
 // import AdvancedDashboard from './AdvancedDashboard';
 import CollaborationPanel from './CollaborationPanel';
 import DataValidationPanel from './DataValidationPanel';
@@ -893,8 +894,7 @@ export default function DashboardView() {
                       {/* Chart Container */}
                       <div className={`${
                         layoutMode === 'list' && !isFullscreen ? 'flex-1' : 'w-full'
-                      }`}>
-                        <ChartRenderer
+                      }`}>                        <EnhancedChartRenderer
                           chart={chart}
                           data={rawData}
                           theme={dashboardConfig.theme}

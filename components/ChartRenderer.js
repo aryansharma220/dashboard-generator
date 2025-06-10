@@ -28,6 +28,65 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
   // Use AI-powered data processing for more accurate chart rendering
   const processedData = GeminiService.processDataForChart(data, chart);
 
+  // Helper function to render sub-charts for combo charts
+  const renderSubChart = (subChart, index) => {
+    const subChartData = GeminiService.processDataForChart(data, subChart);
+    const colorIndex = index % COLORS.length;
+    
+    switch (subChart.type) {
+      case 'bar':
+        return (
+          <BarChart data={subChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
+            <XAxis dataKey={subChart.xAxis} {...axisProps} />
+            <YAxis {...axisProps} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Bar 
+              dataKey={subChart.yAxis} 
+              fill={COLORS[colorIndex]}
+              name={subChart.yAxis}
+              radius={[2, 2, 0, 0]}
+            />
+          </BarChart>
+        );
+      case 'line':
+        return (
+          <LineChart data={subChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
+            <XAxis dataKey={subChart.xAxis} {...axisProps} />
+            <YAxis {...axisProps} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Line 
+              type="monotone" 
+              dataKey={subChart.yAxis} 
+              stroke={COLORS[colorIndex]}
+              strokeWidth={2}
+              dot={{ fill: COLORS[colorIndex], strokeWidth: 2, r: 3 }}
+              name={subChart.yAxis}
+            />
+          </LineChart>
+        );
+      default:
+        return <div className="text-center text-gray-500">Unsupported sub-chart type</div>;
+    }
+  };
+
+  const renderDefaultChart = () => (
+    <BarChart {...commonProps}>
+      <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
+      <XAxis dataKey={chart.xAxis} {...axisProps} />
+      <YAxis {...axisProps} />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Legend />
+      <Bar 
+        dataKey={chart.yAxis} 
+        fill={COLORS[0]}
+        name={chart.yAxis}
+        radius={[2, 2, 0, 0]}
+      />
+    </BarChart>
+  );
+
   // Fallback if AI processing fails
   if (!processedData || processedData.length === 0) {
     return (
@@ -164,6 +223,26 @@ export default function ChartRenderer({ chart, data, theme = 'light' }) {
             <Legend />
           </PieChart>
         );
+
+      case 'combo':
+        // Handle combo charts (multiple chart types in one)
+        if (chart.charts && chart.charts.length > 0) {
+          return (
+            <div className="space-y-4">
+              {chart.charts.map((subChart, index) => (
+                <div key={index} className="h-60">
+                  <h4 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {subChart.title}
+                  </h4>
+                  <ResponsiveContainer width="100%" height="100%">
+                    {renderSubChart(subChart, index)}
+                  </ResponsiveContainer>
+                </div>
+              ))}
+            </div>
+          );
+        }
+        return renderDefaultChart();
 
       default:
         return (
