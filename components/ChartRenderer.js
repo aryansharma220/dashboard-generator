@@ -17,15 +17,21 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import useAppStore from '../lib/store';
+import geminiService from '../lib/geminiService';
 
 const COLORS = [
-  '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff00',
-  '#0088fe', '#00c49f', '#ffbb28', '#ff8042', '#8dd1e1'
+  '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444',
+  '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'
 ];
 
 export default function ChartRenderer({ chart, data, theme = 'light' }) {
-  // Process data for the chart
-  const processedData = processDataForChart(data, chart);
+  const { aiAnalysis } = useAppStore();
+  
+  // Use AI-enhanced data processing if insights are available
+  const processedData = aiAnalysis 
+    ? geminiService.processDataForChart(data, chart, aiAnalysis)
+    : processDataForChart(data, chart);
 
   const commonProps = {
     data: processedData,
