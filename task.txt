@@ -1,0 +1,56 @@
+You are my full-stack coding assistant. Help me build a **frontend-only SaaS-style dashboard generator web app** using **React**, **Tailwind CSS**, and **Recharts**. The goal is to let users upload a clean `.csv` or `.xlsx` dataset, define what kind of dashboard they want (charts, filters, groupings), and then generate an interactive dashboard **entirely in the browser**, with multiple **export options**.
+
+---
+
+### 🛠️ High-Level Requirements:
+
+1. **Frontend-Only Web App**
+
+   * No login/authentication
+   * No backend server — everything runs in the browser
+   * Responsive UI using Tailwind CSS
+   * Use React with components broken into clean files
+
+2. **Flow Overview**
+
+   * Landing Page → File Upload (CSV/XLSX)
+   * Step 2: Form to let users define:
+
+     * Columns to use for X and Y axes
+     * Grouping/filters (optional)
+     * Chart types (bar, line, pie, area, etc.)
+   * Step 3: Show dashboard with:
+
+     * One or more interactive charts using `Recharts`
+     * Title + subtitle (editable)
+     * Filters (if applicable)
+
+3. **Export Features**
+
+   * Button to **download dashboard as image (PNG)** using `html2canvas` or `dom-to-image`
+   * Button to **download dashboard as PDF** using `jsPDF` + `html2canvas`
+   * Option to **download the dashboard as a standalone HTML file** (with inline JS and chart config embedded)
+   * Option to **generate a copyable `<iframe>` embed code**
+
+4. **Libraries to Use**
+
+   * `xlsx` or `SheetJS` for Excel parsing
+   * `PapaParse` for CSV parsing
+   * `Recharts` for chart rendering
+   * `html2canvas` and `jsPDF` for export
+   * Optional: `zustand` or `context` for simple state sharing (no Redux)
+
+---
+
+### ✨ Nice-to-Haves
+
+* Support for dark mode
+* Support for multi-chart dashboards
+* Allow user to re-upload data without refreshing
+* Remember chart config in localStorage
+
+---
+
+### 🧪 Example Use Case
+
+> User uploads a sales dataset → selects “Bar chart of Revenue by Month” → gets a dashboard with the chart + filter for Region → downloads it as PNG or PDF for presentation

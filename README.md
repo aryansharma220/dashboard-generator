@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Dashboard Generator
 
-## Getting Started
+A frontend-only SaaS-style dashboard generator web app built with React, Next.js, Tailwind CSS, and Recharts. Create interactive dashboards from CSV and Excel data entirely in your browser!
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **File Upload**: Support for CSV and Excel (.xlsx, .xls) files
+- **Interactive Charts**: Bar, Line, Area, and Pie charts using Recharts
+- **Dashboard Configuration**: Easy-to-use form for setting up charts with X/Y axes, grouping, and filtering
+- **Multiple Export Options**:
+  - PNG image export
+  - PDF export
+  - Standalone HTML file
+  - Embeddable iframe code
+- **Dark/Light Theme**: Toggle between themes
+- **Responsive Design**: Works on desktop and mobile
+- **No Backend Required**: Everything runs in the browser
+- **Data Privacy**: Your data never leaves your browser
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Frontend**: React 19, Next.js 15.3
+- **Styling**: Tailwind CSS 4
+- **Charts**: Recharts
+- **File Processing**: 
+  - PapaParse for CSV parsing
+  - SheetJS (xlsx) for Excel parsing
+- **Export**: 
+  - html2canvas for image capture
+  - jsPDF for PDF generation
+- **State Management**: Zustand
+- **Icons**: Lucide React
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📋 Prerequisites
 
-## Learn More
+- Node.js 18+ 
+- npm or yarn
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+3. **Open your browser** and navigate to `http://localhost:3000`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📊 How to Use
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Step 1: Upload Data
+- Drag and drop a CSV or Excel file, or click to browse
+- Supported formats: `.csv`, `.xlsx`, `.xls`
+- Your data is processed entirely in the browser - no uploads to any server
+
+### Step 2: Configure Dashboard
+- Set your dashboard title and subtitle
+- Add charts by selecting:
+  - Chart type (Bar, Line, Area, Pie)
+  - X-axis column (any column from your data)
+  - Y-axis column (numeric columns only)
+  - Optional grouping column for data segmentation
+- Add multiple charts to create a comprehensive dashboard
+
+### Step 3: View and Export
+- View your interactive dashboard with all configured charts
+- Toggle between light and dark themes
+- Export options:
+  - **PNG**: Download dashboard as image
+  - **PDF**: Generate PDF report
+  - **HTML**: Download standalone HTML file
+  - **Embed**: Get iframe code to embed in websites
+
+## 🎯 Example Use Cases
+
+- **Sales Analytics**: Upload sales data → Create "Revenue by Month" bar chart → Group by Region → Export as PDF for presentation
+- **Survey Results**: Upload survey responses → Create pie charts for different questions → Download as images for reports
+- **Financial Data**: Upload transaction data → Create line charts for trends → Export as standalone HTML for sharing
+
+---
+
+**Built with ❤️ using React, Next.js, and Recharts**

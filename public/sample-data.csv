@@ -1,0 +1,13 @@
+Month,Revenue,Region,Sales_Rep,Units_Sold
+January,50000,North,John Smith,120
+February,52000,North,John Smith,130
+March,48000,North,John Smith,115
+January,45000,South,Jane Doe,110
+February,47000,South,Jane Doe,118
+March,46000,South,Jane Doe,112
+January,55000,East,Bob Johnson,140
+February,58000,East,Bob Johnson,145
+March,60000,East,Bob Johnson,150
+January,42000,West,Alice Brown,105
+February,44000,West,Alice Brown,108
+March,43000,West,Alice Brown,107

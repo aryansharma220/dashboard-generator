@@ -9,9 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/react": "^19.1.7",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
+    "lucide-react": "^0.513.0",
+    "next": "15.3.3",
+    "papaparse": "^5.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.3"
+    "recharts": "^2.15.3",
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
